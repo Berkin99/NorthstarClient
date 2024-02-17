@@ -1,0 +1,48 @@
+/*	ICONS  ////////////////////////////////////////// */
+#MainWindow {background-color: #1d2026;}
+#w_icons {background-color: #131315;}
+/* ////////////////////////////////////////////////// */
+/*	TERMINAL //////////////////////////////////////// */
+#terminalArea {background-color: #17191e;}
+#terminalArea QLineEdit,QPlainTextEdit{
+	color: #757d8c;
+	selection-color: #fff;
+	background-color: #17191e;
+	border:none;
+}
+#terminalLabel{color: #333842;}
+#connectionLabel{color: #333842;}
+#baudrateLabel{color: #757d8c;}
+#comportLabel{color: #757d8c;}
+#versionLabel{color: #333842;}
+#messageArea QAbstractButton,QLineEdit{
+	color: #757d8c;
+	background-color: #17191e;
+	border: 2px solid #131315;
+	border-radius: 0px;}
+#send{
+	selection-color: #fff;
+	color: #bdbec6;
+	background-color: #131315;
+	border: 0px solid #131315;
+	border-radius: 0px;
+	width: 80px;}
+QScrollBar:vertical {
+    background: black;
+    width: 8px;
+}
+QScrollBar::handle:vertical {
+    background: #333842;
+}
+/* ////////////////////////////////////////////////// */
+/*	MENUBUTON  ////////////////////////////////////// */
+#w_icons QPushButton, QLabel{
+	border:none;
+}
+/* ////////////////////////////////////////////////// */
+/*	MENUBAR  //////////////////////////////////////// */
+#menubar{
+color: #fff;
+background-color: #000;
+}
+/* ////////////////////////////////////////////////// */
