@@ -1,0 +1,11 @@
+*.pyc
+build/*
+dist/*
+*.egg-info/
+.coverage
+.venv*
+.tox*
+venv*
+**/cache/*.json
+
+.vscode/
