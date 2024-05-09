@@ -5,13 +5,19 @@
 
 import sys
 import os
+
+sys.path.append('./')
+
+
 import serial.tools.list_ports
-from northlib.ntrp.northport import *
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction
 from PyQt5.QtCore import Qt, pyqtSlot, QFile, QTextStream
+
 from northstar_ui import Ui_MainWindow
+import northlib.ntrp as ntrp
 
 class NorthClient(QMainWindow):
+    
     def __init__(self):
         super(NorthClient,self).__init__()
         #UI Setup
@@ -29,24 +35,28 @@ class NorthClient(QMainWindow):
         self.ui.action57600.triggered.connect(lambda: self.setBaudRate(57600))
         self.ui.action115200.triggered.connect(lambda: self.setBaudRate(115200))
         
-        #Serial Port Object
-        self.northport = NorthPort()
+        # Client Serial
+        self.serialport = None
+        self.serialbaud = 0
+        self.serialcom  = 'COM0'
         self.setBaudRate(int(self.ui.baudrateLabel.text()))
 
         
     def setBaudRate(self,baudrate):
         self.ui.baudrateLabel.setText(str(baudrate))
-        self.northport.baudrate = baudrate        
+        self.serialbaud = baudrate      
 
     def setComPort(self, com):
         self.ui.comportLabel.setText(com)
-        self.northport.com = com
+        self.serialcom = com
         #Set serial port when "COM" selected
-        self.northport.setSerial(self.northport.com,self.northport.baudrate)
+        if self.serialport != None: self.serialport.close()
+        self.serialport = serial.Serial(self.serialcom,self.serialbaud)
+        self.serialport.open()
 
     def portSearch(self):
         #Search and add founded COM ports as QAction to QMenu 
-        ports = self.northport.getAvailablePorts()
+        ports = [port.device for port in serial.tools.list_ports.comports()]
         self.ui.menuCOM.clear()
         for port in ports:
             act = QAction(port, self)
@@ -58,9 +68,10 @@ class NorthClient(QMainWindow):
         message = self.ui.sendmsg.text() # Get the text from text input
         self.ui.sendmsg.clear()          # Clear text input area
         self.ui.sendmsg.setFocus()       # Focus text input area again
-
-        self.northport.transmit(message)                # Transmit
-        self.consoleAppend(message+"\r\n") # Insert the message with <CR><LF>
+        self.consoleAppend(message+"\r\n")      # Insert the message with <CR><LF>
+        
+        if self.serialport != None:
+            self.serialport.write(message.encode()) # Transmit
 
     def consoleAppend(self, data=None):
         if data==None:return #Return if there is no data
@@ -73,7 +84,7 @@ class NorthClient(QMainWindow):
     def closeEvent(self,event):
         # On Close: 
         #"closeEvent()" is predetermined close function by PyQt
-        self.northport.destroy()
+        self.serialport.close()
         event.accept()
 
 
@@ -82,7 +93,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
-    style_path = "nqt/style.qss"
+    style_path = "style.qss"
     abs_file_path = os.path.join(script_dir, style_path)
     with open(abs_file_path,"r") as style_file:
         style_str = style_file.read()
