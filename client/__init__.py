@@ -8,7 +8,6 @@ import os
 
 sys.path.append('./')
 
-
 import serial.tools.list_ports
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction
 from PyQt5.QtCore import Qt, pyqtSlot, QFile, QTextStream
@@ -68,8 +67,12 @@ class NorthClient(QMainWindow):
         message = self.ui.sendmsg.text() # Get the text from text input
         self.ui.sendmsg.clear()          # Clear text input area
         self.ui.sendmsg.setFocus()       # Focus text input area again
+
         self.consoleAppend(message+"\r\n")      # Insert the message with <CR><LF>
+
         
+        # Recognize if it is a Command and return
+        # Else transmit to serial port if not none
         if self.serialport != None:
             self.serialport.write(message.encode()) # Transmit
 
