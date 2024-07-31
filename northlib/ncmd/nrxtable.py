@@ -46,6 +46,10 @@ class NrxTable:
         elif nrxElement.type.varType == nrx.NrxType_e.GROUPSTOP:
             self.ingroup = False
     
+    """ 
+    Search with given string
+    @return : Found Nrx object 
+    """
     def search(self,name = str)->nrx.Nrx:
         part = name.split('.',1)
         nx = None
@@ -65,8 +69,13 @@ class NrxTable:
 
         return None
 
+    """
+    Search with table index int
+    @return : nrx bytearray value 
+    """
     def getByIndex(self,index=int)->bytearray:
         if index>len(self.table): return None
+        nx = nrx.Nrx()
         nx = self.table[index]
         if not nx.type.group: return nx.getValueRaw()
         arr = bytearray()

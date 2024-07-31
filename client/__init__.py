@@ -5,9 +5,9 @@
 
 import sys
 import os
-
 sys.path.append('./')
 
+from collections import deque
 import serial.tools.list_ports
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction
 from PyQt5.QtCore import Qt, pyqtSlot, QFile, QTextStream
@@ -40,6 +40,8 @@ class NorthClient(QMainWindow):
         self.serialcom  = 'COM0'
         self.setBaudRate(int(self.ui.baudrateLabel.text()))
 
+        # Limit The Console Maximum Line 
+        self.ui.console.setMaximumBlockCount(200)
         
     def setBaudRate(self,baudrate):
         self.ui.baudrateLabel.setText(str(baudrate))
@@ -64,13 +66,11 @@ class NorthClient(QMainWindow):
             self.ui.menuCOM.addAction(act)
 
     def consoleSend(self):
-        message = self.ui.sendmsg.text() # Get the text from text input
-        self.ui.sendmsg.clear()          # Clear text input area
-        self.ui.sendmsg.setFocus()       # Focus text input area again
+        message = self.ui.sendmsg.text()        # Get the text from text input
+        self.ui.sendmsg.clear()                 # Clear text input area
+        self.ui.sendmsg.setFocus()              # Focus text input area again
 
         self.consoleAppend(message+"\r\n")      # Insert the message with <CR><LF>
-
-        
         # Recognize if it is a Command and return
         # Else transmit to serial port if not none
         if self.serialport != None:
@@ -80,14 +80,14 @@ class NorthClient(QMainWindow):
         if data==None:return #Return if there is no data
         self.ui.console.insertPlainText(data)
         self.ui.console.verticalScrollBar().setValue(self.ui.console.verticalScrollBar().maximum())
-
+        
     def consoleClear(self):
         self.ui.console.clear()
-        
+
     def closeEvent(self,event):
         # On Close: 
         #"closeEvent()" is predetermined close function by PyQt
-        self.serialport.close()
+        if self.serialport!= None: self.serialport.close()
         event.accept()
 
 

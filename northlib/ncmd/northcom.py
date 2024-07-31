@@ -27,8 +27,8 @@ class NorthCOM(NorthNRF):
     NorthCommander Core Class
     Set URI : radio:/radioindex/ch/bandwidth/address
 
-    Communicates with agent.
-    Parameter, Function Syncronisation
+    * Communicates with agent.
+    * Parameter, Function Syncronisation
     """
 
     CMD_PARAM_CONTENT    = 1

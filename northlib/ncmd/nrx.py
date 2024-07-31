@@ -64,7 +64,10 @@ class NrxType_e(Enum):
     GROUPSTOP  = 8
 
 class NrxType():
-
+    """
+    NRX Type
+    * @rawtype =   
+    """
     def __init__(self,rawtype):
         self.varType  = nrx.NrxTypeParse(rawtype)
         self.varBytes = 2**(rawtype&NRX_BYTES_MASK)
@@ -75,7 +78,14 @@ class NrxType():
         if rawtype&NRX_GROUP: self.group = True
 
 class Nrx:
-    #CMD,1,#index1,type1,name
+    """
+    NRX Initializer.  
+    * @index = NRX Table index
+    * @type  = raw nrx type (uint8_t)
+    * @name  = string name (not with group name)
+    NRTP Packet for add NRX = CMD,1,index,type,name
+    CMD-1 = Table append command.
+    """
     def __init__(self,index=0,rawtype=None,name=str):
         self.index = index
         self.type  = NrxType(rawtype)
@@ -94,6 +104,8 @@ class Nrx:
         self.nrxList.append(nrx)
 
 def NrxParse(rawarray = bytearray)->Nrx:
+    """ Rawbytearray to Nrx Object """
+
     nrxindex = int(rawarray[0])
     nrxtype = int(rawarray[1])
     nrxname = bytearray()
@@ -104,7 +116,10 @@ def NrxParse(rawarray = bytearray)->Nrx:
     element = Nrx(index=nrxindex,rawtype=nrxtype,name=nrxname.decode(errors='ignore'))
     return element
 
+
 def NrxTypeParse (rawtype):
+    """ Rawtype(byte) to NrxType_e """
+
     if rawtype&NRX_GROUP:
         if rawtype&NRX_START: return NrxType_e.GROUPSTART
         return NrxType_e.GROUPSTOP
@@ -123,30 +138,36 @@ def NrxTypeParse (rawtype):
         elif bytesize==4: return NrxType_e.INT32    
 
 def NrxValueParse (rawvalue,vartype):
-        parser = {
-            NrxType_e.UINT8: lambda arr:struct.unpack( 'B', arr[0:1])[0],
-            NrxType_e.UINT16:lambda arr:struct.unpack('<H', arr[0:2])[0],
-            NrxType_e.UINT32:lambda arr:struct.unpack('<I', arr[0:4])[0],
-            NrxType_e.INT8:  lambda arr:struct.unpack( 'b', arr[0:1])[0],
-            NrxType_e.INT16: lambda arr:struct.unpack('<h', arr[0:2])[0],
-            NrxType_e.INT32: lambda arr:struct.unpack('<i', arr[0:4])[0],
-            NrxType_e.FLOAT: lambda arr:struct.unpack('<f', arr[0:4])[0],
-        }
-        return parser.get(vartype)(rawvalue)
+    """ NrxType_e based Bytes to value """
+
+    parser = {
+        NrxType_e.UINT8: lambda arr:struct.unpack( 'B', arr[0:1])[0],
+        NrxType_e.UINT16:lambda arr:struct.unpack('<H', arr[0:2])[0],
+        NrxType_e.UINT32:lambda arr:struct.unpack('<I', arr[0:4])[0],
+        NrxType_e.INT8:  lambda arr:struct.unpack( 'b', arr[0:1])[0],
+        NrxType_e.INT16: lambda arr:struct.unpack('<h', arr[0:2])[0],
+        NrxType_e.INT32: lambda arr:struct.unpack('<i', arr[0:4])[0],
+        NrxType_e.FLOAT: lambda arr:struct.unpack('<f', arr[0:4])[0],
+    }
+    return parser.get(vartype)(rawvalue)
 
 def NrxValueUnite (value,vartype)->bytes:
-        parser = {
-            NrxType_e.UINT8: lambda val:struct.pack( 'B', val),
-            NrxType_e.UINT16:lambda val:struct.pack('<H', val),
-            NrxType_e.UINT32:lambda val:struct.pack('<I', val),
-            NrxType_e.INT8:  lambda val:struct.pack( 'b', val),
-            NrxType_e.INT16: lambda val:struct.pack('<h', val),
-            NrxType_e.INT32: lambda val:struct.pack('<i', val),
-            NrxType_e.FLOAT: lambda val:struct.pack('<f', val),
-        }
-        return parser.get(vartype)(value)
+    """ NrxType_e based Value to bytes """
+
+    parser = {
+        NrxType_e.UINT8: lambda val:struct.pack( 'B', val),
+        NrxType_e.UINT16:lambda val:struct.pack('<H', val),
+        NrxType_e.UINT32:lambda val:struct.pack('<I', val),
+        NrxType_e.INT8:  lambda val:struct.pack( 'b', val),
+        NrxType_e.INT16: lambda val:struct.pack('<h', val),
+        NrxType_e.INT32: lambda val:struct.pack('<i', val),
+        NrxType_e.FLOAT: lambda val:struct.pack('<f', val),
+    }
+    return parser.get(vartype)(value)
 
 
-def NrxLog (nx):
+def NrxLog (nx)->None:
+    """ Prints the nrx values """
+
     print("[" + str(nx.index) + "] : " + nx.type.varType.name + " : " + str(nx.name) + " : " + str(nx.value))
 
